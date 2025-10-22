@@ -1,0 +1,67 @@
+/* === Global Theme Overrides === */
+
+/* Primary brand color */
+:root {
+  --fc-primary: #004080;   /* Deep Blue */
+  --fc-secondary: #f0ad4e; /* Gold/Accent */
+  --fc-light: #f8f9fa;
+  --fc-dark: #212529;
+  --fc-body: #f5f7fa;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--fc-body);
+  color: var(--fc-dark);
+}
+
+/* Navbar */
+.navbar {
+  background-color: var(--fc-primary) !important;
+}
+.navbar .nav-link,
+.navbar-brand {
+  color: white !important;
+  font-weight: 500;
+}
+.navbar .nav-link:hover {
+  color: var(--fc-secondary) !important;
+}
+
+/* Hero section */
+.hero {
+  background: linear-gradient(135deg, var(--fc-primary), #0066cc);
+  color: white;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: var(--fc-primary);
+  border-color: var(--fc-primary);
+}
+.btn-primary:hover {
+  background-color: #0066cc;
+  border-color: #0066cc;
+}
+.btn-outline-light:hover {
+  background-color: var(--fc-secondary);
+  border-color: var(--fc-secondary);
+  color: #fff;
+}
+
+/* Cards */
+.card {
+  border: none;
+  border-radius: 0.75rem;
+}
+.card h4 {
+  color: var(--fc-primary);
+}
+
+/* Footer */
+footer {
+  background-color: var(--fc-primary);
+  color: white;
+  padding: 1.5rem 0;
+  text-align: center;
+}

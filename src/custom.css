@@ -1,0 +1,7 @@
+// === Custom Theme Overrides ===
+$primary: #004080;
+$secondary: #f0ad4e;
+$body-bg: #f5f7fa;
+$font-family-base: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+
+@import "bootstrap/scss/bootstrap";
