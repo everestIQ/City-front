@@ -8,6 +8,13 @@ import {
   FaHeadset,
   FaMobileAlt,
   FaStar,
+  FaClipboardCheck,
+  FaFileSignature,
+  FaMoneyBillWave,
+  FaSmileBeam,
+  FaLock,
+  FaCloud,
+  FaCreditCard,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
@@ -61,14 +68,19 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+            transition={{ duration: 1 }}
           >
             <h1 className="display-3 fw-bold mb-3">Welcome to First City Bank</h1>
             <p className="lead mb-4">
               Experience seamless online banking built for your lifestyle — fast,
               secure, and innovative.
             </p>
-            <div className="mt-4">
+            <motion.div
+              className="mt-4"
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 100 }}
+            >
               <Button
                 as={Link}
                 to="/register"
@@ -81,17 +93,15 @@ export default function Home() {
               <Button as={Link} to="/login" variant="outline-light" size="lg">
                 Login
               </Button>
-            </div>
+            </motion.div>
           </motion.div>
         </Container>
       </section>
 
-      {/* Services */}
+      {/* Core Services */}
       <section className="py-5 bg-light">
         <Container>
-          <h2 className="text-center mb-5 fw-bold text-primary">
-            Our Core Services
-          </h2>
+          <h2 className="text-center mb-5 fw-bold text-primary">Our Core Services</h2>
           <Row>
             {[
               {
@@ -111,7 +121,7 @@ export default function Home() {
               },
             ].map((service, i) => (
               <Col md={4} key={i} className="mb-4">
-                <motion.div whileHover={{ y: -6 }}>
+                <motion.div whileHover={{ y: -10, scale: 1.05 }}>
                   <Card className="h-100 shadow-sm border-0 glass-card text-center">
                     <Card.Body>
                       {service.icon}
@@ -126,12 +136,44 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Why Choose Us */}
+      {/* 🆕 Digital Banking Experience */}
       <section className="py-5 bg-white">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
+          <motion.img
+            src="/digital-banking.jpg"
+            alt="Digital Banking Experience"
+            className="w-full md:w-1/2 rounded-3xl shadow-lg"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          />
+          <motion.div
+            className="md:w-1/2"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Next-Level Digital Banking Experience
+            </h2>
+            <p className="text-muted mb-4">
+              From mobile deposits to instant transfers, First City Bank provides
+              the tools you need to stay in control of your finances — anywhere,
+              anytime.
+            </p>
+            <ul className="space-y-3 text-gray-600">
+              <li>✔ Real-time transaction alerts</li>
+              <li>✔ Seamless account linking</li>
+              <li>✔ 24/7 secure mobile access</li>
+            </ul>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Why Choose Us */}
+      <section className="py-5 bg-light">
         <Container>
-          <h2 className="text-center mb-5 fw-bold text-primary">
-            Why Choose First City Bank?
-          </h2>
+          <h2 className="text-center mb-5 fw-bold text-primary">Why Choose First City Bank?</h2>
           <Row>
             {[
               {
@@ -151,7 +193,7 @@ export default function Home() {
               },
             ].map((item, i) => (
               <Col md={4} key={i} className="mb-4 text-center">
-                <motion.div whileHover={{ scale: 1.05 }}>
+                <motion.div whileHover={{ scale: 1.1 }}>
                   {item.icon}
                   <h5 className="fw-bold mt-3">{item.title}</h5>
                   <p className="text-muted">{item.text}</p>
@@ -162,7 +204,153 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* Testimonials Carousel */}
+      {/* 🆕 Security & Trust (Corporate theme + parallax ready) */}
+<section className="relative py-20 bg-white overflow-hidden">
+  {/* Parallax Background */}
+  <motion.div
+    className="absolute inset-0 bg-fixed bg-center bg-cover opacity-10"
+    style={{
+      backgroundImage: "url('/security-bg.jpg')",
+    }}
+    initial={{ backgroundPositionY: "0%" }}
+    whileInView={{ backgroundPositionY: "50%" }}
+    transition={{ duration: 2, ease: "easeInOut" }}
+  ></motion.div>
+
+  {/* Content */}
+  <div className="relative container mx-auto px-6 text-center">
+    <motion.h2
+      className="text-4xl font-bold text-primary mb-6"
+      initial={{ opacity: 0, y: 40 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.7 }}
+    >
+      Built on Trust & Security
+    </motion.h2>
+
+    <p className="text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+      At First City Bank, your trust is our foundation. We employ advanced
+      encryption, AI-powered fraud detection, and continuous system monitoring
+      to keep your money and information safe — day and night.
+    </p>
+
+    {/* Features */}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10">
+      {[
+        {
+          icon: <FaShieldAlt className="text-blue-600" size={45} />,
+          title: "Bank-Grade Encryption",
+          desc: "We protect your data with cutting-edge 256-bit encryption technology.",
+        },
+        {
+          icon: <FaCloud className="text-indigo-600" size={45} />,
+          title: "Secure Cloud Backup",
+          desc: "Your financial records are safely stored and instantly recoverable.",
+        },
+        {
+          icon: <FaLock className="text-blue-700" size={45} />,
+          title: "24/7 Monitoring",
+          desc: "Real-time fraud detection ensures suspicious activity never goes unchecked.",
+        },
+      ].map((item, i) => (
+        <motion.div
+          key={i}
+          className="bg-white rounded-xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition-all duration-300"
+          whileHover={{ y: -8, scale: 1.03 }}
+        >
+          <div className="flex justify-center mb-4">{item.icon}</div>
+          <h5 className="font-semibold text-gray-800 mb-2">{item.title}</h5>
+          <p className="text-gray-600 text-sm leading-relaxed">{item.desc}</p>
+        </motion.div>
+      ))}
+    </div>
+  </div>
+</section>
+
+
+      {/* Loan Process (your existing one) */}
+        {/* Loan Process Section */}
+      <section className="py-5 bg-light">
+        <Container>
+          <h2 className="text-center mb-5 fw-bold text-primary">
+            How to Get a Loan in 4 Easy Steps
+          </h2>
+          <Row className="text-center">
+            {[
+              {
+                icon: <FaClipboardCheck className="text-primary" size={40} />,
+                title: "1. Apply Online",
+                text: "Fill out a simple online loan application in minutes.",
+              },
+              {
+                icon: <FaFileSignature className="text-success" size={40} />,
+                title: "2. Submit Documents",
+                text: "Upload your ID and proof of income for quick verification.",
+              },
+              {
+                icon: <FaMoneyBillWave className="text-warning" size={40} />,
+                title: "3. Get Approved",
+                text: "Receive loan approval and terms instantly after review.",
+              },
+              {
+                icon: <FaSmileBeam className="text-info" size={40} />,
+                title: "4. Receive Funds",
+                text: "Money is credited directly to your account — fast and secure.",
+              },
+            ].map((step, i) => (
+              <Col md={3} sm={6} key={i} className="mb-4">
+                <motion.div whileHover={{ y: -5 }}>
+                  <Card className="h-100 shadow-sm border-0 glass-card">
+                    <Card.Body>
+                      {step.icon}
+                      <h5 className="fw-bold mt-3">{step.title}</h5>
+                      <p className="text-muted">{step.text}</p>
+                    </Card.Body>
+                  </Card>
+                </motion.div>
+              </Col>
+            ))}
+          </Row>
+        </Container>
+      </section>
+      {/* Mobile Banking App Showcase */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-10">
+          <motion.div
+            className="md:w-1/2"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Manage Everything on the Go
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Our mobile app gives you total control of your finances. Transfer funds,
+              track spending, and manage your cards with a few taps.
+            </p>
+            <ul className="space-y-2 text-gray-600">
+              <li>📱 Instant balance checks</li>
+              <li>💳 Secure card management</li>
+              <li>🌍 24/7 global access</li>
+            </ul>
+          </motion.div>
+          <motion.div
+            className="relative md:w-1/2"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <img
+              src="/mobile-app.jpg"
+              alt="Mobile Banking App"
+              className="w-full rounded-3xl shadow-xl"
+            />
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
       <section className="py-5 bg-light">
         <Container className="text-center">
           <h2 className="fw-bold text-primary mb-5">What Our Customers Say</h2>
@@ -175,7 +363,7 @@ export default function Home() {
             <img
               src={testimonials[current].image}
               alt={testimonials[current].name}
-              className="rounded-circle mb-4"
+              className="rounded-circle mb-4 shadow-sm"
               style={{ width: "100px", height: "100px", objectFit: "cover" }}
             />
             <p className="fst-italic mx-auto" style={{ maxWidth: "600px" }}>
@@ -194,15 +382,27 @@ export default function Home() {
           background: "linear-gradient(90deg, #0a4cff, #0a2a8a)",
         }}
       >
-        <Container>
-          <h2 className="fw-bold mb-3">Join First City Bank Today</h2>
-          <p className="mb-4">
-            Open your account in minutes and enjoy a new level of digital banking.
-          </p>
-          <Button as={Link} to="/register" variant="light" size="lg" className="fw-semibold">
-            Create an Account
-          </Button>
-        </Container>
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          transition={{ duration: 1 }}
+        >
+          <Container>
+            <h2 className="fw-bold mb-3">Join First City Bank Today</h2>
+            <p className="mb-4">
+              Open your account in minutes and enjoy a new level of digital banking.
+            </p>
+            <Button
+              as={Link}
+              to="/register"
+              variant="light"
+              size="lg"
+              className="fw-semibold"
+            >
+              Create an Account
+            </Button>
+          </Container>
+        </motion.div>
       </section>
 
       {/* Styles */}
@@ -215,7 +415,7 @@ export default function Home() {
             transition: all 0.3s ease;
           }
           .glass-card:hover {
-            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
           }
           .hero h1 {
             letter-spacing: 1px;

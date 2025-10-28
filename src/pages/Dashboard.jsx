@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import axios from "axios";
 import { clearAuthData, getAuthData } from "../utils/auth";
 import LogoutButton from "../components/LogoutButton";
 import { FaUserCircle, FaExclamationTriangle } from "react-icons/fa";
+import TransactionsList from "../components/TransactionsList.jsx";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -24,9 +26,10 @@ export default function Dashboard() {
     referenceId: "",
     withdrawMethod: "",
     destinationAccount: "",
+    currency: "USD", 
   });
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
   const auth = getAuthData();
   const token = auth?.token;
 
@@ -67,7 +70,7 @@ export default function Dashboard() {
       alert("Amount must be greater than zero");
       return;
     }
-    if (account && parseFloat(formData.amount) > account.balance) {
+    if (account && showModal !== "deposit" && parseFloat(formData.amount) > account.balance) {
       alert("Insufficient funds");
       return;
     }
@@ -79,7 +82,7 @@ export default function Dashboard() {
           { amount: parseFloat(formData.amount) },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        alert("Deposit successful");
+        toast.success("✅ Deposit successful!");
       }
       if (showModal === "withdraw") {
         await axios.post(
@@ -87,7 +90,7 @@ export default function Dashboard() {
           { amount: parseFloat(formData.amount) },
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        alert("Withdrawal successful");
+        toast.success("✅ Withdrawal successful!");
       }
       if (showModal === "transfer") {
         let payload = { amount: parseFloat(formData.amount), transferType: formData.transferType };
@@ -112,7 +115,7 @@ export default function Dashboard() {
         await axios.post("http://localhost:5000/dashboard/transfer", payload, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        alert("Transfer successful");
+         toast.success("✅ Transfer successful!");
       }
 
       setShowModal(null);
@@ -132,11 +135,44 @@ export default function Dashboard() {
       });
       fetchDashboard();
     } catch (err) {
-      alert("Failed: " + (err.response?.data?.error || "Something went wrong"));
+      toast.error("❌ " + (err.response?.data?.error || "Something went wrong"));
     }
   };
+  // Group transactions by date: Today, Yesterday, or full date
+function groupTransactions(transactions) {
+  const groups = {};
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  transactions.forEach((tx) => {
+    const date = new Date(tx.timestamp);
+    let groupLabel;
+
+    if (date.toDateString() === today.toDateString()) {
+      groupLabel = "Today";
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      groupLabel = "Yesterday";
+    } else {
+      groupLabel = date.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+
+    if (!groups[groupLabel]) groups[groupLabel] = [];
+    groups[groupLabel].push(tx);
+  });
+
+  return groups;
+}
+
 
   if (loading) return <p>Loading your dashboard...</p>;
+  // ✅ Use grouped transaction display
+  const grouped = groupTransactions(transactions);
+
 
   return (
     <div className="container mt-4">
@@ -178,55 +214,41 @@ export default function Dashboard() {
       </div>
 
       {/* Transactions */}
-      <div className="card p-3 shadow-sm">
-        <h4>Recent Transactions</h4>
-        {transactions.length === 0 ? (
-          <p className="text-muted">No recent transactions.</p>
-        ) : (
-          <ul className="list-group">
-            {transactions.map((tx) => (
-              <li key={tx.id} className="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                  <span className="fw-bold">{tx.type}</span> - {tx.description}
-                  <br />
-                  <small className="text-muted">{new Date(tx.createdAt).toLocaleString()}</small>
-                </div>
-                <span className={`badge rounded-pill ${tx.type === "DEBIT" ? "bg-danger" : "bg-success"} fs-6`}>
-                  {tx.type === "DEBIT" ? "-" : "+"}${tx.amount.toFixed(2)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <div className="mt-4">
+  <TransactionsList grouped={grouped} />
+</div>
 
       {/* === Modal === */}
       {showModal && (
         <div className="modal show d-block" tabIndex="-1">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content rounded-3 shadow-lg border-0">
-              <form onSubmit={handleSubmitAction} onReset={() => setFormData({
-                amount: "",
-                recipientEmail: "",
-                transferType: "",
-                bankName: "",
-                accountNumber: "",
-                swiftCode: "",
-                iban: "",
-                recipientName: "",
-                depositMethod: "",
-                referenceId: "",
-                withdrawMethod: "",
-                destinationAccount: "",
-              })}>
+              <form onSubmit={handleSubmitAction}>
                 {/* Modal Header */}
                 <div className="modal-header bg-primary text-white">
                   <h5 className="modal-title text-capitalize fw-bold">{showModal}</h5>
                   <button
-                    type="button"
-                    className="btn-close btn-close-white"
-                    onClick={() => setShowModal(null)}
-                  />
+  type="button"
+  className="btn-close btn-close-white"
+  onClick={() => {
+    setShowModal(null);
+    setFormData({
+      amount: "",
+      recipientEmail: "",
+      transferType: "",
+      bankName: "",
+      accountNumber: "",
+      swiftCode: "",
+      iban: "",
+      recipientName: "",
+      depositMethod: "",
+      referenceId: "",
+      withdrawMethod: "",
+      destinationAccount: "",
+      currency: "USD",
+    });
+  }}
+/>
                 </div>
 
                 {/* Modal Body */}
@@ -249,6 +271,7 @@ export default function Dashboard() {
                           <option value="MOBILE">Mobile Money</option>
                         </select>
                       </div>
+
                       <div className="mb-3">
                         <label className="form-label">Reference ID</label>
                         <input
@@ -259,16 +282,21 @@ export default function Dashboard() {
                           required
                         />
                       </div>
+
                       <div className="mb-3">
                         <label className="form-label">Amount</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="form-control"
-                          value={formData.amount}
-                          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                          required
-                        />
+                        <div className="input-group">
+                          <span className="input-group-text bg-light border-end-0">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="form-control border-start-0"
+                            placeholder="Enter amount"
+                            value={formData.amount}
+                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                            required
+                          />
+                        </div>
                       </div>
                     </>
                   )}
@@ -290,6 +318,7 @@ export default function Dashboard() {
                           <option value="MOBILE">Mobile Money</option>
                         </select>
                       </div>
+
                       <div className="mb-3">
                         <label className="form-label">Destination Account / Bank</label>
                         <input
@@ -300,16 +329,21 @@ export default function Dashboard() {
                           required
                         />
                       </div>
+
                       <div className="mb-3">
                         <label className="form-label">Amount</label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          className="form-control"
-                          value={formData.amount}
-                          onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                          required
-                        />
+                        <div className="input-group">
+                          <span className="input-group-text bg-light border-end-0">$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            className="form-control border-start-0"
+                            placeholder="Enter amount"
+                            value={formData.amount}
+                            onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                            required
+                          />
+                        </div>
                       </div>
                     </>
                   )}
@@ -333,52 +367,66 @@ export default function Dashboard() {
                         </div>
                       )}
 
+                      {/* LOCAL TRANSFER */}
                       {formData.transferType === "LOCAL" && (
                         <>
-                          <div className="mb-3">
-                            <label className="form-label">Recipient Email</label>
-                            <input
-                              type="email"
-                              className="form-control"
-                              value={formData.recipientEmail}
-                              onChange={(e) => setFormData({ ...formData, recipientEmail: e.target.value })}
-                              required
-                            />
-                          </div>
                           <div className="mb-3">
                             <label className="form-label">Bank Name</label>
                             <input
                               type="text"
                               className="form-control"
+                              placeholder="Enter bank name"
                               value={formData.bankName}
                               onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                               required
                             />
                           </div>
+
                           <div className="mb-3">
                             <label className="form-label">Account Number</label>
                             <input
                               type="text"
                               className="form-control"
+                              placeholder="Enter recipient account number"
                               value={formData.accountNumber}
                               onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
                               required
                             />
                           </div>
+
                           <div className="mb-3">
                             <label className="form-label">Amount</label>
+                            <div className="input-group">
+                              <span className="input-group-text bg-light border-end-0">$</span>
+                              <input
+                                type="number"
+                                step="0.01"
+                                className="form-control border-start-0"
+                                placeholder="Enter amount"
+                                value={formData.amount}
+                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <label className="form-label text-muted">Recipient Email (Optional)</label>
                             <input
-                              type="number"
-                              step="0.01"
-                              className="form-control"
-                              value={formData.amount}
-                              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                              required
+                              type="email"
+                              className="form-control bg-transparent"
+                              placeholder="you@example.com"
+                              value={formData.recipientEmail}
+                              onChange={(e) => setFormData({ ...formData, recipientEmail: e.target.value })}
                             />
+                            <small className="text-secondary fst-italic">
+                              Used for transfer notifications (optional)
+                            </small>
                           </div>
                         </>
                       )}
 
+                      {/* INTERNATIONAL TRANSFER */}
                       {formData.transferType === "INTL" && (
                         <>
                           <div className="mb-3">
@@ -386,51 +434,77 @@ export default function Dashboard() {
                             <input
                               type="text"
                               className="form-control"
+                              placeholder="Enter full name"
                               value={formData.recipientName}
                               onChange={(e) => setFormData({ ...formData, recipientName: e.target.value })}
                               required
                             />
                           </div>
+
                           <div className="mb-3">
                             <label className="form-label">Bank Name</label>
                             <input
                               type="text"
                               className="form-control"
+                              placeholder="Enter recipient bank"
                               value={formData.bankName}
                               onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
                               required
                             />
                           </div>
+
                           <div className="mb-3">
                             <label className="form-label">IBAN</label>
                             <input
                               type="text"
                               className="form-control"
+                              placeholder="Enter IBAN"
                               value={formData.iban}
                               onChange={(e) => setFormData({ ...formData, iban: e.target.value })}
                               required
                             />
                           </div>
+
                           <div className="mb-3">
                             <label className="form-label">SWIFT Code</label>
                             <input
                               type="text"
                               className="form-control"
+                              placeholder="Enter SWIFT/BIC code"
                               value={formData.swiftCode}
                               onChange={(e) => setFormData({ ...formData, swiftCode: e.target.value })}
                               required
                             />
                           </div>
+
                           <div className="mb-3">
                             <label className="form-label">Amount</label>
+                            <div className="input-group">
+                              <span className="input-group-text bg-light border-end-0">$</span>
+                              <input
+                                type="number"
+                                step="0.01"
+                                className="form-control border-start-0"
+                                placeholder="Enter amount"
+                                value={formData.amount}
+                                onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                required
+                              />
+                            </div>
+                          </div>
+
+                          <div className="mb-3">
+                            <label className="form-label text-muted">Recipient Email (Optional)</label>
                             <input
-                              type="number"
-                              step="0.01"
-                              className="form-control"
-                              value={formData.amount}
-                              onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                              required
+                              type="email"
+                              className="form-control bg-transparent"
+                              placeholder="you@example.com"
+                              value={formData.recipientEmail}
+                              onChange={(e) => setFormData({ ...formData, recipientEmail: e.target.value })}
                             />
+                            <small className="text-secondary fst-italic">
+                              For transfer confirmation (optional)
+                            </small>
                           </div>
                         </>
                       )}
@@ -441,12 +515,30 @@ export default function Dashboard() {
                 {/* Modal Footer */}
                 <div className="modal-footer border-0">
                   <button
-                    type="button"
-                    className="btn btn-outline-danger"
-                    onClick={() => setShowModal(null)}
-                  >
-                    Cancel
-                  </button>
+  type="button"
+  className="btn btn-outline-danger"
+  onClick={() => {
+    setShowModal(null);
+    setFormData({
+      amount: "",
+      recipientEmail: "",
+      transferType: "",
+      bankName: "",
+      accountNumber: "",
+      swiftCode: "",
+      iban: "",
+      recipientName: "",
+      depositMethod: "",
+      referenceId: "",
+      withdrawMethod: "",
+      destinationAccount: "",
+      currency: "USD",
+    });
+  }}
+>
+  Cancel
+</button>
+
                   <button
                     type="submit"
                     className="btn btn-success"

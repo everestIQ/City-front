@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { getAuthData } from "../utils/auth";
 
-export default function UsersTable({ onCredit }) {
+export default function UsersTable() {
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [message, setMessage] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showFundModal, setShowFundModal] = useState(false);
+  const [fundAmount, setFundAmount] = useState("");
+  const [selectedAccountId, setSelectedAccountId] = useState(null);
 
   const [newUser, setNewUser] = useState({
     firstName: "",
@@ -42,6 +45,43 @@ export default function UsersTable({ onCredit }) {
       setFilteredUsers(res.data.users);
     } catch (err) {
       handleError(err, "Failed to fetch users");
+    }
+  };
+
+  // ✅ Add funds to user account
+  const handleAddFunds = async () => {
+    if (!fundAmount || isNaN(fundAmount)) {
+      setMessage("❌ Enter a valid amount.");
+      return;
+    }
+    try {
+      const res = await axios.post(
+        "http://localhost:5000/admin/fund",
+        { accountId: selectedAccountId, amount: parseFloat(fundAmount) },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage("✅ " + res.data.message);
+      setShowFundModal(false);
+      setFundAmount("");
+      setSelectedAccountId(null);
+      fetchUsers();
+    } catch (err) {
+      handleError(err, "Failed to add funds");
+    }
+  };
+
+  // ✅ Suspend or reactivate transactions
+  const toggleTransactionStatus = async (userId, isSuspended) => {
+    try {
+      const res = await axios.patch(
+        `http://localhost:5000/admin/users/${userId}/suspend`,
+        { suspend: !isSuspended },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setMessage("✅ " + res.data.message);
+      fetchUsers();
+    } catch (err) {
+      handleError(err, "Failed to update transaction status");
     }
   };
 
@@ -132,18 +172,13 @@ export default function UsersTable({ onCredit }) {
       {message && <p>{message}</p>}
 
       <div style={{ marginBottom: "15px" }}>
-        <button
-          style={{ marginRight: "10px" }}
-          onClick={() => setShowCreateModal(true)}
-        >
-          ➕ Create User
-        </button>
+        <button onClick={() => setShowCreateModal(true)}>➕ Create User</button>
 
         <input
           type="text"
           placeholder="Search by name/email/phone..."
           onChange={(e) => handleSearch(e.target.value)}
-          style={{ padding: "6px", marginRight: "10px" }}
+          style={{ padding: "6px", margin: "0 10px" }}
         />
 
         <select onChange={(e) => handleFilter(e.target.value)}>
@@ -153,7 +188,6 @@ export default function UsersTable({ onCredit }) {
         </select>
       </div>
 
-      {/* Users Table */}
       <table border="1" cellPadding="10" style={{ width: "100%" }}>
         <thead>
           <tr>
@@ -165,6 +199,7 @@ export default function UsersTable({ onCredit }) {
             <th>Role</th>
             <th>Accounts</th>
             <th>Total Balance</th>
+            <th>Status</th>
             <th>Joined</th>
             <th>Actions</th>
           </tr>
@@ -188,6 +223,13 @@ export default function UsersTable({ onCredit }) {
                     ?.reduce((sum, acc) => sum + (acc.balance || 0), 0)
                     .toFixed(2) || "0.00"}
                 </td>
+                <td>
+                  {u.suspended ? (
+                    <span style={{ color: "red" }}>Suspended</span>
+                  ) : (
+                    <span style={{ color: "green" }}>Active</span>
+                  )}
+                </td>
                 <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                 <td>
                   <button
@@ -198,213 +240,60 @@ export default function UsersTable({ onCredit }) {
                   >
                     ✏️ Edit
                   </button>
-
+                  <button
+                    style={{ marginLeft: "5px", color: "green" }}
+                    onClick={() => {
+                      const acc = u.accounts?.[0];
+                      if (acc) {
+                        setSelectedAccountId(acc.id);
+                        setShowFundModal(true);
+                      } else {
+                        setMessage("⚠️ No account found for this user.");
+                      }
+                    }}
+                  >
+                    💰 Add Fund
+                  </button>
+                  <button
+                    style={{
+                      marginLeft: "5px",
+                      color: u.suspended ? "green" : "red",
+                    }}
+                    onClick={() => toggleTransactionStatus(u.id, u.suspended)}
+                  >
+                    {u.suspended ? "✅ Reactivate" : "🚫 Suspend"}
+                  </button>
                   <button
                     onClick={() => deleteUser(u.id)}
                     style={{ marginLeft: "5px", color: "red" }}
                   >
                     🗑 Delete
                   </button>
-
-                  {/* ✅ Add Funds Button */}
-                  {onCredit && (
-                    <button
-                      onClick={() => {
-                        // If user has multiple accounts, pick first for now
-                        const account =
-                          u.accounts && u.accounts.length > 0
-                            ? u.accounts[0]
-                            : null;
-                        if (!account)
-                          return alert(
-                            "This user has no account to credit."
-                          );
-                        onCredit(account);
-                      }}
-                      style={{
-                        marginLeft: "5px",
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "5px",
-                        padding: "5px 8px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      💰 Add Funds
-                    </button>
-                  )}
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="10">No users found</td>
+              <td colSpan="11">No users found</td>
             </tr>
           )}
         </tbody>
       </table>
 
-      {/* CREATE USER MODAL */}
-      {showCreateModal && (
+      {/* FUND MODAL */}
+      {showFundModal && (
         <div style={modalOverlay}>
           <div style={modalContent}>
-            <h3>Create User</h3>
-            <label>First Name:</label>
+            <h3>Add Funds</h3>
             <input
-              type="text"
-              value={newUser.firstName}
-              onChange={(e) =>
-                setNewUser({ ...newUser, firstName: e.target.value })
-              }
+              type="number"
+              placeholder="Enter amount"
+              value={fundAmount}
+              onChange={(e) => setFundAmount(e.target.value)}
             />
-            <br />
-            <label>Last Name:</label>
-            <input
-              type="text"
-              value={newUser.lastName}
-              onChange={(e) =>
-                setNewUser({ ...newUser, lastName: e.target.value })
-              }
-            />
-            <br />
-            <label>Other Name:</label>
-            <input
-              type="text"
-              value={newUser.otherName}
-              onChange={(e) =>
-                setNewUser({ ...newUser, otherName: e.target.value })
-              }
-            />
-            <br />
-            <label>Email:</label>
-            <input
-              type="email"
-              value={newUser.email}
-              onChange={(e) =>
-                setNewUser({ ...newUser, email: e.target.value })
-              }
-            />
-            <br />
-            <label>Phone:</label>
-            <input
-              type="text"
-              value={newUser.phone}
-              onChange={(e) =>
-                setNewUser({ ...newUser, phone: e.target.value })
-              }
-            />
-            <br />
-            <label>Date of Birth:</label>
-            <input
-              type="date"
-              value={newUser.dob}
-              onChange={(e) =>
-                setNewUser({ ...newUser, dob: e.target.value })
-              }
-            />
-            <br />
-            <label>Password:</label>
-            <input
-              type="password"
-              value={newUser.password}
-              onChange={(e) =>
-                setNewUser({ ...newUser, password: e.target.value })
-              }
-            />
-            <br />
-            <label>Role:</label>
-            <select
-              value={newUser.role}
-              onChange={(e) =>
-                setNewUser({ ...newUser, role: e.target.value })
-              }
-            >
-              <option value="CUSTOMER">Customer</option>
-              <option value="ADMIN">Admin</option>
-            </select>
-            <br />
             <div style={{ marginTop: "10px" }}>
-              <button onClick={() => setShowCreateModal(false)}>Cancel</button>
-              <button onClick={createUser}>Create</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* EDIT USER MODAL */}
-      {showEditModal && editUser && (
-        <div style={modalOverlay}>
-          <div style={modalContent}>
-            <h3>Edit User</h3>
-            <label>First Name:</label>
-            <input
-              type="text"
-              value={editUser.firstName}
-              onChange={(e) =>
-                setEditUser({ ...editUser, firstName: e.target.value })
-              }
-            />
-            <br />
-            <label>Last Name:</label>
-            <input
-              type="text"
-              value={editUser.lastName}
-              onChange={(e) =>
-                setEditUser({ ...editUser, lastName: e.target.value })
-              }
-            />
-            <br />
-            <label>Other Name:</label>
-            <input
-              type="text"
-              value={editUser.otherName || ""}
-              onChange={(e) =>
-                setEditUser({ ...editUser, otherName: e.target.value })
-              }
-            />
-            <br />
-            <label>Email:</label>
-            <input
-              type="email"
-              value={editUser.email}
-              onChange={(e) =>
-                setEditUser({ ...editUser, email: e.target.value })
-              }
-            />
-            <br />
-            <label>Phone:</label>
-            <input
-              type="text"
-              value={editUser.phone || ""}
-              onChange={(e) =>
-                setEditUser({ ...editUser, phone: e.target.value })
-              }
-            />
-            <br />
-            <label>Date of Birth:</label>
-            <input
-              type="date"
-              value={editUser.dob ? editUser.dob.substring(0, 10) : ""}
-              onChange={(e) =>
-                setEditUser({ ...editUser, dob: e.target.value })
-              }
-            />
-            <br />
-            <label>Role:</label>
-            <select
-              value={editUser.role}
-              onChange={(e) =>
-                setEditUser({ ...editUser, role: e.target.value })
-              }
-            >
-              <option value="CUSTOMER">Customer</option>
-              <option value="ADMIN">Admin</option>
-            </select>
-            <br />
-            <div style={{ marginTop: "10px" }}>
-              <button onClick={() => setShowEditModal(false)}>Cancel</button>
-              <button onClick={updateUser}>Update</button>
+              <button onClick={() => setShowFundModal(false)}>Cancel</button>
+              <button onClick={handleAddFunds}>Add Funds</button>
             </div>
           </div>
         </div>

@@ -16,10 +16,12 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { getAuthData, saveAuthData } from "./utils/auth.js";
 
+// ✅ Import Toast
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function Layout() {
   const location = useLocation();
-
-  // Hide footer on login and register
   const hideFooter = ["/login", "/register"].includes(location.pathname);
 
   return (
@@ -33,8 +35,6 @@ function Layout() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-
-          {/* Protect customer + admin dashboard */}
           <Route
             path="/dashboard"
             element={
@@ -44,8 +44,6 @@ function Layout() {
             }
           />
           <Route path="/admin-login" element={<AdminLogin />} />
-
-          {/* Protect admin dashboard (only admins) */}
           <Route
             path="/admin-dashboard"
             element={
@@ -65,13 +63,15 @@ function App() {
   useEffect(() => {
     const auth = getAuthData();
     if (auth?.token && auth?.user) {
-      // re-init logout timer after page reload
       saveAuthData(auth.token, auth.user);
     }
   }, []);
 
   return (
     <Router>
+      {/* ✅ Toast container goes here */}
+      <ToastContainer position="top-right" autoClose={2000} />
+
       <Layout />
     </Router>
   );
