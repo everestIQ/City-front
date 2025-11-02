@@ -44,3 +44,17 @@
 body {
   padding-top: 70px; /* Adjust depending on navbar height */
 }
+
+.card {
+  transition: 0.25s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1rem 2rem rgba(0,0,0,0.08);
+}
+
+.btn-lg {
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}

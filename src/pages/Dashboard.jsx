@@ -6,6 +6,7 @@ import { clearAuthData, getAuthData } from "../utils/auth";
 import LogoutButton from "../components/LogoutButton";
 import { FaUserCircle, FaExclamationTriangle } from "react-icons/fa";
 import TransactionsList from "../components/TransactionsList.jsx";
+import { v4 as uuid } from "uuid";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -92,9 +93,12 @@ export default function Dashboard() {
         );
         toast.success("✅ Withdrawal successful!");
       }
-      if (showModal === "transfer") {
-        let payload = { amount: parseFloat(formData.amount), transferType: formData.transferType };
-
+     if (showModal === "transfer") {
+  let payload = { 
+    amount: parseFloat(formData.amount), 
+    transferType: formData.transferType,
+    referenceId: uuid() // ✅ Prevent duplicate transfers
+  };
         if (formData.transferType === "LOCAL") {
           payload = {
             ...payload,
@@ -185,34 +189,71 @@ function groupTransactions(transactions) {
       </div>
 
       {/* Account Info */}
-      <div className="card my-3 p-3 shadow-sm">
-        <h4>Account Overview</h4>
-        <p><strong>Email:</strong> {user?.email}</p>
-        <p><strong>Role:</strong> {user?.role}</p>
-        <p><strong>Member Since:</strong> {new Date(user?.createdAt).toLocaleDateString()}</p>
-        {account ? (
-          <>
-            <p><strong>Account Number:</strong> {account.accountNumber}</p>
-            <h5 className="mt-3">Balance</h5>
-            <p className="fs-3 text-success">${account.balance.toFixed(2)}</p>
-          </>
-        ) : (
-          <div className="alert alert-warning d-flex align-items-center gap-2">
-            <FaExclamationTriangle /> No account found
-          </div>
-        )}
-      </div>
+      <div className="row g-4">
 
-      {/* Quick Actions */}
-      <div className="card my-3 p-3 shadow-sm">
-        <h4>Quick Actions</h4>
-        <div className="d-flex flex-wrap gap-2">
-          <button className="btn btn-success" onClick={() => setShowModal("deposit")}>Deposit</button>
-          <button className="btn btn-warning" onClick={() => setShowModal("withdraw")}>Withdraw</button>
-          <button className="btn btn-primary" onClick={() => setShowModal("transfer")}>Transfer</button>
+  {/* Profile Card */}
+  <div className="col-lg-4">
+    <div className="card border-0 shadow-sm rounded-4 p-4 text-center bg-white">
+      <FaUserCircle className="text-primary display-4 mb-3" />
+      <h4 className="fw-bold">{user?.name}</h4>
+      <p className="text-muted mb-1">{user?.email}</p>
+
+      {account ? (
+        <div className="mt-3">
+          <span className="badge bg-primary-subtle text-primary px-3 py-2 rounded-pill border border-primary">
+            Account: {account.accountNumber}
+          </span>
         </div>
+      ) : (
+        <div className="alert alert-warning d-flex align-items-center gap-2 mt-3">
+          <FaExclamationTriangle /> No Account Found
+        </div>
+      )}
+    </div>
+  </div>
+
+  {/* Balance Light Card */}
+<div className="col-lg-8">
+  <div
+    className="card border-0 shadow-sm rounded-4 p-0 overflow-hidden"
+    style={{ background: "linear-gradient(135deg, #ffffff, #f3f6ff)" }}
+  >
+    <div className="p-4 d-flex flex-column justify-content-between" style={{ minHeight: "170px" }}>
+      
+      {/* Balance Text */}
+      <div>
+        <p className="text-uppercase text-muted small mb-1">Available Balance</p>
+        <h1 className="fw-bold text-success mb-3">
+          ${account?.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        </h1>
       </div>
 
+      {/* Action Buttons */}
+      <div className="d-flex align-items-center justify-content-start gap-3 mt-2">
+
+        <button
+          className="btn btn-outline-danger d-flex align-items-center gap-2 px-4 py-2 rounded-4 shadow-sm"
+          onClick={() => setShowModal("withdraw")}
+        >
+          <i className="bi bi-arrow-down-circle"></i>
+          Withdraw
+        </button>
+
+        <button
+          className="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-4 shadow-sm"
+          onClick={() => setShowModal("transfer")}
+        >
+          <i className="bi bi-arrow-left-right"></i>
+          Transfer
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</div>
       {/* Transactions */}
       <div className="mt-4">
   <TransactionsList grouped={grouped} />
