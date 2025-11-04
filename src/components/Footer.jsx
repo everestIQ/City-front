@@ -29,8 +29,8 @@ export default function Footer() {
           <Col md={4} className="mb-3">
             <h6 className="fw-bold">Contact Us</h6>
             <p>Email: support@firstcitybank.com</p>
-            <p>Phone: +234 800 123 4567</p>
-            <p>Address: 123 Bank Street, Lagos</p>
+            <p>Phone: +1 889445755 </p>
+            <p>Address:  </p>
           </Col>
         </Row>
 
@@ -43,4 +43,3 @@ export default function Footer() {
     </footer>
   );
 }
-``

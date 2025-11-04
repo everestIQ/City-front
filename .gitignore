@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# media files
+*.png
+*.jpg
+*.jpeg
+*.gif

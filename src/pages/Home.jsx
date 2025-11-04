@@ -35,8 +35,8 @@ const testimonials = [
       "I got approved for a personal loan within minutes. Excellent service and responsive support team!",
   },
   {
-    name: "Amina Yusuf",
-    role: "Student",
+    name: "John Lee",
+    role: "Engineer",
     image: "/users/user3.jpg",
     quote:
       "Their mobile app is the best I've used. I can save, send, and monitor my expenses from anywhere.",
@@ -140,7 +140,7 @@ export default function Home() {
       <section className="py-5 bg-white">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
           <motion.img
-            src="/digital-banking.jpg"
+            src="/digital-banking.jpeg"
             alt="Digital Banking Experience"
             className="w-full md:w-1/2 rounded-3xl shadow-lg"
             initial={{ opacity: 0, x: -50 }}
