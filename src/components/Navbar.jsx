@@ -1,5 +1,7 @@
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import { Navbar, Nav, Container, Button, Dropdown } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { FaBars } from "react-icons/fa";
 
 export default function AppNavbar() {
   const navigate = useNavigate();
@@ -13,43 +15,88 @@ export default function AppNavbar() {
   };
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
+    <Navbar expand="lg" sticky="top" style={{ background: "#0b1b33", padding: "0.9rem 0" }}>
       <Container>
-        <Navbar.Brand as={Link} to="/">First City Bank</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/">Home</Nav.Link>
+        <Navbar.Brand
+          as={Link}
+          to="/"
+          className="fw-bold text-white"
+          style={{ fontSize: "1.4rem", letterSpacing: "0.5px" }}
+        >
+          First City Bank
+        </Navbar.Brand>
 
-            {/* Show only if NOT logged in */}
-            {!token && (
-              <>
-                <Nav.Link as={Link} to="/login">Login</Nav.Link>
-                <Nav.Link as={Link} to="/register">Register</Nav.Link>
-              </>
-            )}
+        {/* Desktop Nav Links */}
+        <Nav className="ms-auto d-none d-lg-flex align-items-center">
+          <Nav.Link as={Link} to="/" className="text-white me-3">Home</Nav.Link>
+          <Nav.Link as={Link} to="/about" className="text-white me-3">About</Nav.Link>
+          <Nav.Link as={Link} to="/contact" className="text-white me-3">Contact Us</Nav.Link>
 
-            {/* Show if logged in as CUSTOMER */}
-            {token && role === "CUSTOMER" && (
-              <Nav.Link as={Link} to="/dashboard">Dashboard</Nav.Link>
-            )}
-
-          
-          </Nav>
-
-          {/* Logout button if logged in */}
-          {token && (
+          {/* Open Account Button */}
+          {!token && (
             <Button
-              variant="outline-danger"
-              className="ms-3"
-              onClick={handleLogout}
+              as={Link}
+              to="/register"
+              variant="primary"
+              className="px-4 fw-semibold"
+              style={{ borderRadius: "8px" }}
             >
+              Open Account
+            </Button>
+          )}
+
+          {/* Dashboard If Logged In
+          {token && role === "CUSTOMER" && (
+            <Nav.Link as={Link} to="/dashboard" className="text-white me-3">Dashboard</Nav.Link>
+          )} */}
+
+          {/* Logout */}
+          {token && (
+            <Button variant="outline-light" className="px-4" onClick={handleLogout}>
               Logout
             </Button>
           )}
-        </Navbar.Collapse>
+        </Nav>
+
+        {/* Mobile Menu Dropdown - Premium Style */}
+<Dropdown className="d-lg-none ms-auto pe-0">
+  <Dropdown.Toggle
+    variant="link"
+    className="premium-menu-toggle text-white"
+  >
+    <FaBars />
+  </Dropdown.Toggle>
+
+  <Dropdown.Menu
+    align="end"
+    className="shadow border-0 py-3 rounded-3"
+    style={{ minWidth: "190px", background: "#ffffff" }}
+  >
+    <Dropdown.Item as={Link} to="/">Home</Dropdown.Item>
+    <Dropdown.Item as={Link} to="/about">About</Dropdown.Item>
+    <Dropdown.Item as={Link} to="/contact">Contact Us</Dropdown.Item>
+
+    {!token && (
+      <>
+        <Dropdown.Item as={Link} to="/login">Login</Dropdown.Item>
+        <Dropdown.Item as={Link} to="/register" className="fw-semibold text-primary">Open Account</Dropdown.Item>
+      </>
+    )}
+
+    {token && role === "CUSTOMER" && (
+      <Dropdown.Item as={Link} to="/dashboard">Dashboard</Dropdown.Item>
+    )}
+
+    {token && (
+      <Dropdown.Item onClick={handleLogout} className="text-danger fw-semibold">
+        Logout
+      </Dropdown.Item>
+    )}
+  </Dropdown.Menu>
+</Dropdown>
+
+
       </Container>
     </Navbar>
   );
 }
-

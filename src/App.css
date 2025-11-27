@@ -58,3 +58,67 @@ body {
   font-weight: 600;
   letter-spacing: 0.4px;
 }
+
+/* Premium mobile menu icon hover effect */
+.premium-menu-toggle:hover {
+  opacity: 0.7;
+  transition: opacity 0.25s ease-in-out;
+}
+
+/* Dropdown styles for premium touch */
+.dropdown-menu .dropdown-item {
+  font-size: 0.95rem;
+  border-radius: 6px;
+}
+
+.dropdown-menu .dropdown-item:hover {
+  background: #f0f4ff;
+  color: #0b1b33;
+}
+
+.navbar .container {
+  padding-right: 0 !important;
+}
+
+.premium-menu-toggle {
+  padding: 0 !important;
+  margin: 0 !important;
+  line-height: 0 !important;
+  border: none !important;
+}
+
+.premium-menu-toggle svg {
+  width: 24px;
+  height: 24px;
+}
+
+.premium-menu-toggle:focus,
+.premium-menu-toggle:active {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.about-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.about-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* Timeline Strip */
+.timeline-strip {
+  display: flex;
+  justify-content: center;
+  gap: 1.8rem;
+  flex-wrap: wrap;
+  padding: 1.5rem 0;
+}
+
+.timeline-item {
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  font-size: 0.9rem;
+}

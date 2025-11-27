@@ -375,6 +375,15 @@ export default function Home() {
         </Container>
       </section>
 
+      {/* Trusted Logos */}
+<section className="py-4" style={{ background: "#f3f6fb" }}>
+  <Container className="text-center">
+    <p className="text-muted mb-3">Proudly trusted by over 100,000+ users worldwide</p>
+    <img src="/trusted-logos.png" alt="Trusted Logos" style={{ maxWidth: "260px", opacity: 0.85 }} />
+  </Container>
+</section>
+
+
       {/* CTA */}
       <section
         className="py-5 text-center text-white"
