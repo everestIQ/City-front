@@ -1,8 +1,12 @@
 import axios from "axios";
 
 // Backend base URL
+const baseURL =
+  import.meta.env.VITE_API_URL || "https://city-server-6geb.onrender.com";
+
 const API = axios.create({
-  baseURL: "http://localhost:5000", // change if deploying
+  baseURL,
+  withCredentials: true, // <-- IMPORTANT for CORS + cookies
 });
 
 // Automatically attach token (if available) to requests
