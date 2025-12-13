@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { loginUser } from "../api";
+
 import { saveAuthData } from "../utils/auth";
 
 function Login() {
@@ -11,32 +12,23 @@ function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    try {
-      const res = await axios.post("http://localhost:5000/auth/login", {
-        email,
-        password,
-      });
+  try {
+    const res = await loginUser({ email, password });
 
-      const { token, user } = res.data;
+    const { token, user } = res.data;
+    saveAuthData(token, user, remember);
 
-      // Save token + user data
-      saveAuthData(token, user, remember);
+    navigate(user.role === "ADMIN" ? "/admin-dashboard" : "/dashboard");
+  } catch (err) {
+    console.error(err);
+    setError(err.response?.data?.error || "Login failed");
+  }
+};
 
-      // Redirect based on role
-      if (user.role === "ADMIN") {
-        navigate("/admin-dashboard");
-      } else {
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Login failed. Please try again.");
-    }
-  };
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">

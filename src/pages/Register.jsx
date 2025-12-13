@@ -1,10 +1,15 @@
-// pages/Register.jsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+// Use env-based API URL (works locally + on Render)
+const API_URL = import.meta.env.VITE_API_URL || "https://city-server-6geb.onrender.com";
 
 function Register() {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -20,72 +25,78 @@ function Register() {
     securityAnswer: "",
   });
 
-  const [error, setError] = useState("");
-
   const validateStep = () => {
     setError("");
+
     if (step === 1) {
-      if (
-        !formData.firstName ||
-        !formData.lastName ||
-        !formData.email ||
-        !formData.phone ||
-        !formData.address ||
-        !formData.dob
-      ) {
+      const { firstName, lastName, email, phone, address, dob } = formData;
+      if (!firstName || !lastName || !email || !phone || !address || !dob) {
         setError("Please fill in all required personal details.");
         return false;
       }
     }
+
     if (step === 2) {
-      if (!formData.accountType || !formData.password || !formData.confirmPassword) {
+      const { accountType, password, confirmPassword } = formData;
+      if (!accountType || !password || !confirmPassword) {
         setError("Please complete account setup.");
         return false;
       }
-      if (formData.password !== formData.confirmPassword) {
+      if (password !== confirmPassword) {
         setError("Passwords do not match.");
         return false;
       }
     }
+
     if (step === 3) {
       if (!formData.securityQuestion || !formData.securityAnswer) {
         setError("Please set a security question and answer.");
         return false;
       }
     }
+
     return true;
   };
 
-  const nextStep = () => {
-    if (validateStep()) setStep(step + 1);
-  };
-  const prevStep = () => setStep(step - 1);
+  const nextStep = () => validateStep() && setStep((s) => s + 1);
+  const prevStep = () => setStep((s) => s - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     const birthDate = new Date(formData.dob);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
+    const age = new Date().getFullYear() - birthDate.getFullYear();
+
     if (age < 18) {
       setError("You must be at least 18 years old to register.");
       return;
     }
 
     try {
-      const res = await fetch("http://localhost:5000/auth/register", {
+      setLoading(true);
+
+      const res = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include", // safe if backend later uses cookies
         body: JSON.stringify({
           ...formData,
-          accountType: formData.accountType.toUpperCase(), // ensure enum matches backend
+          accountType: formData.accountType.toUpperCase(),
         }),
       });
 
-      if (!res.ok) throw new Error("Registration failed");
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Registration failed");
+      }
+
       navigate("/login");
     } catch (err) {
-      setError(err.message);
+      setError(err.message || "Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -98,79 +109,33 @@ function Register() {
       <form onSubmit={handleSubmit}>
         {/* Step Indicator */}
         <div className="mb-4 text-center">
-          <span className={`badge me-2 ${step === 1 ? "bg-primary" : "bg-secondary"}`}>1</span>
-          <span className={`badge me-2 ${step === 2 ? "bg-primary" : "bg-secondary"}`}>2</span>
-          <span className={`badge me-2 ${step === 3 ? "bg-primary" : "bg-secondary"}`}>3</span>
-          <span className={`badge ${step === 4 ? "bg-primary" : "bg-secondary"}`}>4</span>
+          {[1, 2, 3, 4].map((n) => (
+            <span
+              key={n}
+              className={`badge me-2 ${step === n ? "bg-primary" : "bg-secondary"}`}
+            >
+              {n}
+            </span>
+          ))}
         </div>
 
-        {/* Step 1: Personal Info */}
+        {/* STEP 1 */}
         {step === 1 && (
           <>
-            <div className="mb-3">
-              <label className="form-label">First Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Last Name</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Other Name (Optional)</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.otherName}
-                onChange={(e) => setFormData({ ...formData, otherName: e.target.value })}
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Email Address</label>
-              <input
-                type="email"
-                className="form-control"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Phone Number</label>
-              <input
-                type="tel"
-                className="form-control"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Home Address</label>
-              <input
-                type="text"
-                className="form-control"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                required
-              />
-            </div>
+            {["firstName", "lastName", "otherName", "email", "phone", "address"].map((field) => (
+              <div className="mb-3" key={field}>
+                <label className="form-label text-capitalize">
+                  {field.replace(/([A-Z])/g, " $1")}
+                </label>
+                <input
+                  type={field === "email" ? "email" : "text"}
+                  className="form-control"
+                  value={formData[field]}
+                  onChange={(e) => setFormData({ ...formData, [field]: e.target.value })}
+                  required={field !== "otherName"}
+                />
+              </div>
+            ))}
 
             <div className="mb-3">
               <label className="form-label">Date of Birth</label>
@@ -189,7 +154,7 @@ function Register() {
           </>
         )}
 
-        {/* Step 2: Account Setup */}
+        {/* STEP 2 */}
         {step === 2 && (
           <>
             <div className="mb-3">
@@ -202,45 +167,33 @@ function Register() {
               >
                 <option value="">-- Select --</option>
                 <option value="SAVINGS">Savings</option>
-                <option value="CHECKING">Checking</option>
+                <option value="CURRENT">Current</option>
+''''
                 <option value="BUSINESS">Business</option>
               </select>
             </div>
 
-            <div className="mb-3">
-              <label className="form-label">Password</label>
-              <input
-                type="password"
-                className="form-control"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                required
-              />
-            </div>
-
-            <div className="mb-3">
-              <label className="form-label">Confirm Password</label>
-              <input
-                type="password"
-                className="form-control"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                required
-              />
-            </div>
+            {["password", "confirmPassword"].map((f) => (
+              <div className="mb-3" key={f}>
+                <label className="form-label">{f === "password" ? "Password" : "Confirm Password"}</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  value={formData[f]}
+                  onChange={(e) => setFormData({ ...formData, [f]: e.target.value })}
+                  required
+                />
+              </div>
+            ))}
 
             <div className="d-flex justify-content-between">
-              <button type="button" className="btn btn-secondary" onClick={prevStep}>
-                ← Back
-              </button>
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                Next →
-              </button>
+              <button type="button" className="btn btn-secondary" onClick={prevStep}>← Back</button>
+              <button type="button" className="btn btn-primary" onClick={nextStep}>Next →</button>
             </div>
           </>
         )}
 
-        {/* Step 3: Security */}
+        {/* STEP 3 */}
         {step === 3 && (
           <>
             <div className="mb-3">
@@ -248,7 +201,6 @@ function Register() {
               <input
                 type="text"
                 className="form-control"
-                placeholder="E.g. What is your mother's maiden name?"
                 value={formData.securityQuestion}
                 onChange={(e) => setFormData({ ...formData, securityQuestion: e.target.value })}
                 required
@@ -267,40 +219,28 @@ function Register() {
             </div>
 
             <div className="d-flex justify-content-between">
-              <button type="button" className="btn btn-secondary" onClick={prevStep}>
-                ← Back
-              </button>
-              <button type="button" className="btn btn-primary" onClick={nextStep}>
-                Next →
-              </button>
+              <button type="button" className="btn btn-secondary" onClick={prevStep}>← Back</button>
+              <button type="button" className="btn btn-primary" onClick={nextStep}>Next →</button>
             </div>
           </>
         )}
 
-        {/* Step 4: Confirmation */}
+        {/* STEP 4 */}
         {step === 4 && (
           <>
             <h5 className="mb-3">Please confirm your details:</h5>
             <ul className="list-group mb-3">
-              <li className="list-group-item"><strong>First Name:</strong> {formData.firstName}</li>
-              <li className="list-group-item"><strong>Last Name:</strong> {formData.lastName}</li>
-              <li className="list-group-item"><strong>Other Name:</strong> {formData.otherName || "-"}</li>
-              <li className="list-group-item"><strong>Email:</strong> {formData.email}</li>
-              <li className="list-group-item"><strong>Phone:</strong> {formData.phone}</li>
-              <li className="list-group-item"><strong>Address:</strong> {formData.address}</li>
-              <li className="list-group-item"><strong>Date of Birth:</strong> {formData.dob}</li>
-              <li className="list-group-item"><strong>Account Type:</strong> {formData.accountType}</li>
-              <li className="list-group-item"><strong>Password:</strong> {"•".repeat(formData.password.length)}</li>
-              <li className="list-group-item"><strong>Security Question:</strong> {formData.securityQuestion}</li>
-              <li className="list-group-item"><strong>Security Answer:</strong> {"•".repeat(formData.securityAnswer.length)}</li>
+              {Object.entries(formData).map(([k, v]) => (
+                <li key={k} className="list-group-item">
+                  <strong>{k.replace(/([A-Z])/g, " $1")}:</strong> {k.includes("password") || k.includes("Answer") ? "••••••" : v || "-"}
+                </li>
+              ))}
             </ul>
 
             <div className="d-flex justify-content-between">
-              <button type="button" className="btn btn-secondary" onClick={prevStep}>
-                ← Back
-              </button>
-              <button type="submit" className="btn btn-success">
-                ✅ Confirm & Register
+              <button type="button" className="btn btn-secondary" onClick={prevStep}>← Back</button>
+              <button type="submit" className="btn btn-success" disabled={loading}>
+                {loading ? "Registering..." : "✅ Confirm & Register"}
               </button>
             </div>
           </>
