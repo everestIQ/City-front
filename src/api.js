@@ -1,19 +1,11 @@
 import axios from "axios";
 
-// Determine backend URL (production or local)
-const baseURL =
-  import.meta.env.VITE_API_URL?.trim() ||
-  (window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://city-server-6geb.onrender.com");
-
-// Create Axios instance
 const API = axios.create({
-  baseURL,
+  baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
 });
 
-// Auto-attach JWT token to every request
+// Attach JWT token
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {
