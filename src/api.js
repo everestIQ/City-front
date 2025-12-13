@@ -1,11 +1,10 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "https://city-server-6geb.onrender.com",
   withCredentials: true,
 });
 
-// Attach JWT token
 API.interceptors.request.use((req) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -14,14 +13,14 @@ API.interceptors.request.use((req) => {
   return req;
 });
 
-// ==== AUTH ====
+// AUTH
 export const registerUser = (data) => API.post("/auth/register", data);
 export const loginUser = (data) => API.post("/auth/login", data);
 
-// ==== DASHBOARD ====
+// DASHBOARD
 export const getDashboard = () => API.get("/dashboard");
 
-// ==== TRANSACTIONS ====
+// TRANSACTIONS
 export const deposit = (id, amount) =>
   API.post(`/transactions/${id}/deposit`, { amount });
 
