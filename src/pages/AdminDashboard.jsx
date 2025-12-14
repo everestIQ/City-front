@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import API from "../api"; // ✅ Use centralized API
 import { clearAuthData, getAuthData } from "../utils/auth";
 import LogoutButton from "../components/LogoutButton";
 import UsersTable from "../components/UsersTable";
@@ -20,7 +20,6 @@ export default function AdminDashboard() {
 
   const navigate = useNavigate();
   const auth = getAuthData();
-  const token = auth?.token;
 
   useEffect(() => {
     if (!auth) navigate("/admin-login");
@@ -39,9 +38,7 @@ export default function AdminDashboard() {
   // ---- FETCH DATA ----
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/admin/users", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await API.get("/admin/users");
       setUsers(res.data.users);
     } catch (err) {
       handleError(err, "Failed to fetch users");
@@ -50,9 +47,7 @@ export default function AdminDashboard() {
 
   const fetchTransactions = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/admin/transactions", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await API.get("/admin/transactions");
       setTransactions(res.data.transactions);
     } catch (err) {
       handleError(err, "Failed to fetch transactions");
@@ -67,11 +62,7 @@ export default function AdminDashboard() {
   // ---- USER ACTIONS ----
   const changeRole = async (id, newRole) => {
     try {
-      const res = await axios.put(
-        `http://localhost:5000/admin/users/${id}/role`,
-        { role: newRole },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.put(`/admin/users/${id}/role`, { role: newRole });
       setMessage("✅ " + res.data.message);
       fetchUsers();
     } catch (err) {
@@ -81,11 +72,7 @@ export default function AdminDashboard() {
 
   const saveUser = async () => {
     try {
-      const res = await axios.put(
-        `http://localhost:5000/admin/users/${selectedUser.id}`,
-        selectedUser,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.put(`/admin/users/${selectedUser.id}`, selectedUser);
       setMessage("✅ " + res.data.message);
       setSelectedUser(null);
       fetchUsers();
@@ -97,10 +84,7 @@ export default function AdminDashboard() {
   const deleteUser = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      const res = await axios.delete(
-        `http://localhost:5000/admin/users/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.delete(`/admin/users/${id}`);
       setMessage("✅ " + res.data.message);
       fetchUsers();
     } catch (err) {
@@ -111,11 +95,7 @@ export default function AdminDashboard() {
   // ---- TRANSACTION ACTIONS ----
   const saveTransaction = async () => {
     try {
-      const res = await axios.put(
-        `http://localhost:5000/admin/transactions/${selectedTransaction.id}`,
-        selectedTransaction,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.put(`/admin/transactions/${selectedTransaction.id}`, selectedTransaction);
       setMessage("✅ " + res.data.message);
       setSelectedTransaction(null);
       fetchTransactions();
@@ -126,11 +106,7 @@ export default function AdminDashboard() {
 
   const createTransaction = async (newTransaction) => {
     try {
-      const res = await axios.post(
-        "http://localhost:5000/admin/transactions",
-        newTransaction,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.post("/admin/transactions", newTransaction);
       setMessage("✅ " + res.data.message);
       fetchTransactions();
     } catch (err) {
@@ -147,14 +123,10 @@ export default function AdminDashboard() {
   const handleCredit = async () => {
     if (!amount || !selectedAccount) return;
     try {
-      const res = await axios.post(
-        "http://localhost:5000/admin/credit",
-        {
-          accountNumber: selectedAccount.accountNumber,
-          amount: parseFloat(amount),
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await API.post("/admin/credit", {
+        accountNumber: selectedAccount.accountNumber,
+        amount: parseFloat(amount),
+      });
       setMessage("✅ " + res.data.message);
       setAmount("");
       setShowCreditModal(false);
@@ -248,8 +220,7 @@ export default function AdminDashboard() {
           <div style={modalContent}>
             <h3>Add Funds to Account</h3>
             <p>
-              <strong>Account Number:</strong>{" "}
-              {selectedAccount?.accountNumber}
+              <strong>Account Number:</strong> {selectedAccount?.accountNumber}
             </p>
             <input
               type="number"

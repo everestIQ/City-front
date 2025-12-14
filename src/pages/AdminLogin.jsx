@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { loginUser } from "../api"; // ✅ import helper
 import { saveAuthData } from "../utils/auth";
 
 export default function AdminLogin() {
@@ -18,7 +18,9 @@ export default function AdminLogin() {
     setMessage("");
 
     try {
-      const res = await axios.post("http://localhost:5000/auth/login", formData);
+      // ✅ use loginUser helper instead of axios.post
+      const res = await loginUser(formData);
+
       console.log("Admin login response:", res.data);
 
       if (res.data.user.role !== "ADMIN") {
@@ -40,12 +42,11 @@ export default function AdminLogin() {
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="card shadow p-4" style={{ width: "100%", maxWidth: "400px" }}>
         <h3 className="text-center mb-3">Admin Login</h3>
+
         <form onSubmit={handleSubmit}>
           {message && (
             <div
-              className={`alert ${
-                message.startsWith("✅") ? "alert-success" : "alert-danger"
-              }`}
+              className={`alert ${message.startsWith("✅") ? "alert-success" : "alert-danger"}`}
             >
               {message}
             </div>
