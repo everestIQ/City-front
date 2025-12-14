@@ -168,7 +168,6 @@ function Register() {
                 <option value="">-- Select --</option>
                 <option value="SAVINGS">Savings</option>
                 <option value="CURRENT">Current</option>
-''''
                 <option value="BUSINESS">Business</option>
               </select>
             </div>
