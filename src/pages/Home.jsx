@@ -24,27 +24,25 @@ import user2 from "../assets/testimonials/user2.jpg";
 import user3 from "../assets/testimonials/user3.jpg";
 
 
+
 const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Small Business Owner",
-    image: user1, // ✅ use imported variable
-    quote:
-      "First City Bank made managing my business finances effortless. The online platform is intuitive and secure.",
+    image: user1,
+    quote: "...",
   },
   {
     name: "David Miller",
     role: "Freelance Designer",
-    image: user2, // ✅
-    quote:
-      "I got approved for a personal loan within minutes. Excellent service and responsive support team!",
+    image: user2,
+    quote: "...",
   },
   {
     name: "John Lee",
     role: "Engineer",
-    image: user3, // ✅
-    quote:
-      "Their mobile app is the best I've used. I can save, send, and monitor my expenses from anywhere.",
+    image: user3,
+    quote: "...",
   },
 ];
 
@@ -318,76 +316,42 @@ export default function Home() {
           </Row>
         </Container>
       </section>
-{/* Mobile Banking App Showcase */}
-<section className="py-20 bg-white">
-  <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-14">
-
-    {/* TEXT CONTENT */}
-    <motion.div
-      className="md:w-1/2"
-      initial={{ opacity: 0, x: -40 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-    >
-      <h2 className="text-3xl md:text-4xl font-bold text-primary mb-5">
-        Bank Smarter. Anytime. Anywhere.
-      </h2>
-
-      <p className="text-gray-600 mb-6 text-lg">
-        Take full control of your finances with our secure and intuitive
-        mobile banking app. Send money, manage cards, and monitor spending —
-        all in one place.
-      </p>
-
-      <ul className="space-y-3 text-gray-700 mb-8">
-        <li className="flex items-center gap-2">
-          <span>📱</span> Real-time balance & transaction alerts
-        </li>
-        <li className="flex items-center gap-2">
-          <span>💳</span> Instantly freeze or manage your cards
-        </li>
-        <li className="flex items-center gap-2">
-          <span>🔒</span> Bank-grade security with 24/7 access
-        </li>
-      </ul>
-
-      {/* CTA */}
-      <div className="flex flex-wrap gap-4">
-        <Link
-          to="/register"
-          className="bg-primary text-white px-6 py-3 rounded-xl font-semibold shadow hover:opacity-90 transition"
-        >
-          Get Started Free
-        </Link>
-        <Link
-          to="/login"
-          className="border border-primary text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary hover:text-white transition"
-        >
-          Sign In
-        </Link>
-      </div>
-    </motion.div>
-
-    {/* IMAGE */}
-    <motion.div
-      className="relative md:w-1/2"
-      initial={{ opacity: 0, x: 40 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-    >
-      <img
-        src={mobileApp}
-        alt="First City Bank Mobile App"
-        className="w-full rounded-3xl shadow-2xl"
-        loading="lazy"
-      />
-    </motion.div>
-
-  </div>
-</section>
-
+      {/* Mobile Banking App Showcase */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-10">
+          <motion.div
+            className="md:w-1/2"
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-3xl font-bold text-primary mb-4">
+              Manage Everything on the Go
+            </h2>
+            <p className="text-gray-600 mb-4">
+              Our mobile app gives you total control of your finances. Transfer funds,
+              track spending, and manage your cards with a few taps.
+            </p>
+            <ul className="space-y-2 text-gray-600">
+              <li>📱 Instant balance checks</li>
+              <li>💳 Secure card management</li>
+              <li>🌍 24/7 global access</li>
+            </ul>
+          </motion.div>
+          <motion.div
+            className="relative md:w-1/2"
+            initial={{ opacity: 0, x: 50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <img
+              src="/mobile-app.jpg"
+              alt="Mobile Banking App"
+              className="w-full rounded-3xl shadow-xl"
+            />
+          </motion.div>
+        </div>
+      </section>
 
 {/* Testimonials */}
 <section className="py-5 bg-light">
