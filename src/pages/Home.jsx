@@ -23,26 +23,27 @@ import user1 from "../assets/testimonials/user1.jpg";
 import user2 from "../assets/testimonials/user2.jpg";
 import user3 from "../assets/testimonials/user3.jpg";
 
-
-
 const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Small Business Owner",
     image: user1,
-    quote: "...",
+    quote:
+      "First City Bank made managing my business finances effortless. The online platform is intuitive and secure.",
   },
   {
     name: "David Miller",
     role: "Freelance Designer",
     image: user2,
-    quote: "...",
+    quote:
+      "I got approved for a personal loan within minutes. Excellent service and responsive support team!",
   },
   {
     name: "John Lee",
     role: "Engineer",
     image: user3,
-    quote: "...",
+    quote:
+      "Their mobile app is the best I've used. I can save, send, and monitor my expenses from anywhere.",
   },
 ];
 
