@@ -19,29 +19,25 @@ import {
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
-import user1 from "../assets/testimonials/user1.jpg";
-import user2 from "../assets/testimonials/user2.jpg";
-import user3 from "../assets/testimonials/user3.jpg";
-
 const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Small Business Owner",
-    image: user1,
+    image: "/testimonials/user1.jpg",
     quote:
       "First City Bank made managing my business finances effortless. The online platform is intuitive and secure.",
   },
   {
     name: "David Miller",
     role: "Freelance Designer",
-    image: user2,
+    image: "/testimonials/user2.jpg",
     quote:
       "I got approved for a personal loan within minutes. Excellent service and responsive support team!",
   },
   {
     name: "John Lee",
     role: "Engineer",
-    image: user3,
+    image: "/testimonials/user3.jpg",
     quote:
       "Their mobile app is the best I've used. I can save, send, and monitor my expenses from anywhere.",
   },
