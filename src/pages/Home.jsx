@@ -19,25 +19,30 @@ import {
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
+import user1 from "../assets/testimonials/user1.jpg";
+import user2 from "../assets/testimonials/user2.jpg";
+import user3 from "../assets/testimonials/user3.jpg";
+
+
 const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Small Business Owner",
-    image: "/users/user1.jpg",
+    image: user1, // ✅ use imported variable
     quote:
       "First City Bank made managing my business finances effortless. The online platform is intuitive and secure.",
   },
   {
     name: "David Miller",
     role: "Freelance Designer",
-    image: "/users/user2.jpg",
+    image: user2, // ✅
     quote:
       "I got approved for a personal loan within minutes. Excellent service and responsive support team!",
   },
   {
     name: "John Lee",
     role: "Engineer",
-    image: "/users/user3.jpg",
+    image: user3, // ✅
     quote:
       "Their mobile app is the best I've used. I can save, send, and monitor my expenses from anywhere.",
   },
@@ -313,75 +318,156 @@ export default function Home() {
           </Row>
         </Container>
       </section>
-      {/* Mobile Banking App Showcase */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-10">
-          <motion.div
-            className="md:w-1/2"
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h2 className="text-3xl font-bold text-primary mb-4">
-              Manage Everything on the Go
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Our mobile app gives you total control of your finances. Transfer funds,
-              track spending, and manage your cards with a few taps.
-            </p>
-            <ul className="space-y-2 text-gray-600">
-              <li>📱 Instant balance checks</li>
-              <li>💳 Secure card management</li>
-              <li>🌍 24/7 global access</li>
-            </ul>
-          </motion.div>
-          <motion.div
-            className="relative md:w-1/2"
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <img
-              src="/mobile-app.jpg"
-              alt="Mobile Banking App"
-              className="w-full rounded-3xl shadow-xl"
-            />
-          </motion.div>
-        </div>
-      </section>
+{/* Mobile Banking App Showcase */}
+<section className="py-20 bg-white">
+  <div className="container mx-auto px-4 flex flex-col-reverse md:flex-row items-center gap-14">
 
-      {/* Testimonials */}
-      <section className="py-5 bg-light">
-        <Container className="text-center">
-          <h2 className="fw-bold text-primary mb-5">What Our Customers Say</h2>
-          <motion.div
-            key={current}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <img
-              src={testimonials[current].image}
-              alt={testimonials[current].name}
-              className="rounded-circle mb-4 shadow-sm"
-              style={{ width: "100px", height: "100px", objectFit: "cover" }}
-            />
-            <p className="fst-italic mx-auto" style={{ maxWidth: "600px" }}>
-              “{testimonials[current].quote}”
-            </p>
-            <h5 className="fw-bold mt-3">{testimonials[current].name}</h5>
-            <p className="text-muted">{testimonials[current].role}</p>
-          </motion.div>
-        </Container>
-      </section>
+    {/* TEXT CONTENT */}
+    <motion.div
+      className="md:w-1/2"
+      initial={{ opacity: 0, x: -40 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+    >
+      <h2 className="text-3xl md:text-4xl font-bold text-primary mb-5">
+        Bank Smarter. Anytime. Anywhere.
+      </h2>
 
-      {/* Trusted Logos */}
-<section className="py-4" style={{ background: "#f3f6fb" }}>
+      <p className="text-gray-600 mb-6 text-lg">
+        Take full control of your finances with our secure and intuitive
+        mobile banking app. Send money, manage cards, and monitor spending —
+        all in one place.
+      </p>
+
+      <ul className="space-y-3 text-gray-700 mb-8">
+        <li className="flex items-center gap-2">
+          <span>📱</span> Real-time balance & transaction alerts
+        </li>
+        <li className="flex items-center gap-2">
+          <span>💳</span> Instantly freeze or manage your cards
+        </li>
+        <li className="flex items-center gap-2">
+          <span>🔒</span> Bank-grade security with 24/7 access
+        </li>
+      </ul>
+
+      {/* CTA */}
+      <div className="flex flex-wrap gap-4">
+        <Link
+          to="/register"
+          className="bg-primary text-white px-6 py-3 rounded-xl font-semibold shadow hover:opacity-90 transition"
+        >
+          Get Started Free
+        </Link>
+        <Link
+          to="/login"
+          className="border border-primary text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary hover:text-white transition"
+        >
+          Sign In
+        </Link>
+      </div>
+    </motion.div>
+
+    {/* IMAGE */}
+    <motion.div
+      className="relative md:w-1/2"
+      initial={{ opacity: 0, x: 40 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.7, ease: "easeOut" }}
+    >
+      <img
+        src={mobileApp}
+        alt="First City Bank Mobile App"
+        className="w-full rounded-3xl shadow-2xl"
+        loading="lazy"
+      />
+    </motion.div>
+
+  </div>
+</section>
+
+
+{/* Testimonials */}
+<section className="py-5 bg-light">
   <Container className="text-center">
-    <p className="text-muted mb-3">Proudly trusted by over 100,000+ users worldwide</p>
-    <img src="/trusted-logos.png" alt="Trusted Logos" style={{ maxWidth: "260px", opacity: 0.85 }} />
+    <h2 className="fw-bold text-primary mb-2">What Our Customers Say</h2>
+    <p className="text-muted mb-5">
+      Real stories from people who trust First City Bank every day
+    </p>
+
+    <motion.div
+      key={current}
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
+      className="mx-auto"
+      style={{ maxWidth: "700px" }}
+    >
+      <div className="bg-white p-4 rounded-4 shadow-sm">
+        <img
+          src={testimonials[current].image}
+          alt={testimonials[current].name}
+          className="rounded-circle mb-3 shadow"
+          style={{
+            width: "90px",
+            height: "90px",
+            objectFit: "cover",
+          }}
+        />
+
+        <p className="fst-italic text-secondary mb-3">
+          “{testimonials[current].quote}”
+        </p>
+
+        <h5 className="fw-bold mb-0">{testimonials[current].name}</h5>
+        <small className="text-muted">{testimonials[current].role}</small>
+      </div>
+    </motion.div>
   </Container>
 </section>
+
+
+{/* Trusted / Social Proof */}
+<section className="py-5" style={{ background: "#f3f6fb" }}>
+  <Container className="text-center">
+    <p className="text-muted mb-4">
+      Trusted by customers across Africa and beyond
+    </p>
+
+    <div className="row justify-content-center g-4">
+      <div className="col-6 col-md-3">
+        <div className="bg-white rounded-4 shadow-sm p-3">
+          <h3 className="fw-bold text-primary mb-0">100K+</h3>
+          <small className="text-muted">Active Users</small>
+        </div>
+      </div>
+
+      <div className="col-6 col-md-3">
+        <div className="bg-white rounded-4 shadow-sm p-3">
+          <h3 className="fw-bold text-primary mb-0">15+</h3>
+          <small className="text-muted">Countries Served</small>
+        </div>
+      </div>
+
+      <div className="col-6 col-md-3">
+        <div className="bg-white rounded-4 shadow-sm p-3">
+          <h3 className="fw-bold text-primary mb-0">99.9%</h3>
+          <small className="text-muted">Uptime</small>
+        </div>
+      </div>
+
+      <div className="col-6 col-md-3">
+        <div className="bg-white rounded-4 shadow-sm p-3">
+          <h3 className="fw-bold text-primary mb-0">24/7</h3>
+          <small className="text-muted">Support</small>
+        </div>
+      </div>
+    </div>
+  </Container>
+</section>
+
 
 
       {/* CTA */}
