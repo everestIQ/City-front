@@ -23,25 +23,29 @@ const testimonials = [
   {
     name: "Sarah Johnson",
     role: "Small Business Owner",
-    image: "/testimonials/user1.jpg",
+    image:
+      "https://res.cloudinary.com/dwn7zhys5/image/upload/q_auto,f_auto,w_200//v1765824864/user1_mvbpfl.jpg",
     quote:
-      "First City Bank made managing my business finances effortless. The online platform is intuitive and secure.",
+      "First City Bank made managing my business finances effortless.",
   },
   {
     name: "David Miller",
     role: "Freelance Designer",
-    image: "/testimonials/user2.jpg",
+    image:
+      "https://res.cloudinary.com/dwn7zhys5/image/upload/v1765824864/user2_2_envmx9.jpg",
     quote:
-      "I got approved for a personal loan within minutes. Excellent service and responsive support team!",
+      "I got approved for a personal loan within minutes.",
   },
   {
     name: "John Lee",
     role: "Engineer",
-    image: "/testimonials/user3.jpg",
+    image:
+      "https://res.cloudinary.com/dwn7zhys5/image/upload/v1765824864/user3_buzpvi.jpg",
     quote:
-      "Their mobile app is the best I've used. I can save, send, and monitor my expenses from anywhere.",
+      "Their mobile app is the best I've used.",
   },
 ];
+
 
 export default function Home() {
   const [current, setCurrent] = useState(0);
