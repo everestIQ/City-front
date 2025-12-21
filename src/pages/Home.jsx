@@ -346,7 +346,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
           >
             <img
-              src="/mobile-app.jpg"
+              src="https://res.cloudinary.com/dwn7zhys5/image/upload/v1766311220/images_1_n1llqz.jpg"
               alt="Mobile Banking App"
               className="w-full rounded-3xl shadow-xl"
             />

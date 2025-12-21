@@ -1,21 +1,46 @@
 import axios from "axios";
 
-// ✅ Use environment variable for API base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://city-server-6geb.onrender.com";
+// ✅ Base URL
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://city-server-6geb.onrender.com";
 
+// ✅ Create axios instance
 const API = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
 });
 
-// ✅ Add auth token to all requests
-API.interceptors.request.use((req) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    req.headers.Authorization = `Bearer ${token}`;
+// ✅ Request interceptor (auth token)
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // 🔄 Notify app that a request started
+    window.dispatchEvent(new Event("api:loading:start"));
+
+    return config;
+  },
+  (error) => {
+    window.dispatchEvent(new Event("api:loading:end"));
+    return Promise.reject(error);
   }
-  return req;
-});
+);
+
+// ✅ Response interceptor
+API.interceptors.response.use(
+  (response) => {
+    window.dispatchEvent(new Event("api:loading:end"));
+    return response;
+  },
+  (error) => {
+    window.dispatchEvent(new Event("api:loading:end"));
+    return Promise.reject(error);
+  }
+);
 
 // ---------------- AUTH ----------------
 export const registerUser = (data) => API.post("/auth/register", data);
