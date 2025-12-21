@@ -65,7 +65,7 @@ export default function Home() {
         style={{
           minHeight: "90vh",
           background:
-            "linear-gradient(rgba(8, 12, 197, 0.8), rgba(14, 19, 83, 0.8)), url('/hero-banking.jpg') center/cover no-repeat",
+            "linear-gradient(rgba(8, 12, 197, 0.8), rgba(14, 19, 83, 0.8)), url('https://res.cloudinary.com/dwn7zhys5/image/upload/v1766313539/hero-banking_um91no.jpg') center/cover no-repeat",
         }}
       >
         <Container>
@@ -144,7 +144,7 @@ export default function Home() {
       <section className="py-5 bg-white">
         <div className="container mx-auto px-4 flex flex-col md:flex-row items-center gap-8">
           <motion.img
-            src="/digital-banking.jpeg"
+            src="https://res.cloudinary.com/dwn7zhys5/image/upload/v1766313350/digital-banking_oecsuo.jpg"
             alt="Digital Banking Experience"
             className="w-full md:w-1/2 rounded-3xl shadow-lg"
             initial={{ opacity: 0, x: -50 }}
