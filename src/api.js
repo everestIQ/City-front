@@ -8,7 +8,6 @@ const API_BASE_URL =
 // ✅ Create axios instance
 const API = axios.create({
   baseURL: API_BASE_URL,
-  withCredentials: true,
 });
 
 // ✅ Request interceptor (auth token)
