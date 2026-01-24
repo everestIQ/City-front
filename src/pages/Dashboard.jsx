@@ -34,7 +34,8 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const auth = getAuthData();
   const token = auth?.token;
-
+  
+  
   /* ---------------- FETCH DASHBOARD ---------------- */
   const fetchDashboard = async () => {
     if (!token) {
@@ -44,6 +45,9 @@ export default function Dashboard() {
 
     try {
       const res = await getDashboard();
+          // 👇 ADD THIS LINE RIGHT HERE
+    console.log("ACCOUNT FROM API:", res.data.account);
+
       setUser(res.data.user);
       setAccount(res.data.account || null);
       setTransactions(res.data.transactions || []);
@@ -62,10 +66,18 @@ export default function Dashboard() {
     fetchDashboard();
   }, [token]);
 
+
+
   /* ---------------- ACTION HANDLER ---------------- */
   const handleSubmitAction = async (e) => {
     e.preventDefault();
 
+      // 🔒 BLOCK ACTIONS IF SUSPENDED
+  if (isSuspended && showModal !== "deposit") {
+    toast.error(suspensionMessage);
+    return;
+  }
+  
     if (parseFloat(formData.amount) <= 0) {
       toast.error("Amount must be greater than zero");
       return;
@@ -176,6 +188,12 @@ export default function Dashboard() {
   if (loading) return <p>Loading your dashboard...</p>;
   const grouped = groupTransactions(transactions);
 
+  // 🔒 Account suspension state
+const isSuspended = account?.suspended === true;
+const suspensionMessage =
+  account?.suspensionMessage || "Your account is currently suspended.";
+
+
   /* ---------------- UI ---------------- */
   return (
     <div className="container mt-4">
@@ -185,6 +203,19 @@ export default function Dashboard() {
         </h2>
         <LogoutButton />
       </div>
+      {/* 🔴 ACCOUNT SUSPENSION BANNER */}
+{isSuspended && (
+  <div className="alert alert-danger d-flex align-items-start gap-2">
+    <FaExclamationTriangle className="mt-1" />
+    <div>
+      <strong>Account Suspended</strong>
+      <div className="small">
+        {suspensionMessage}
+      </div>
+    </div>
+  </div>
+)}
+
 
       <div className="row g-4">
         <div className="col-lg-4">
@@ -213,13 +244,22 @@ export default function Dashboard() {
             </h1>
 
             <div className="d-flex gap-3 mt-3">
-              <button className="btn btn-outline-danger" onClick={() => setShowModal("withdraw")}>
-                Withdraw
-              </button>
-              <button className="btn btn-primary" onClick={() => setShowModal("transfer")}>
-                Transfer
-              </button>
-            </div>
+             <button
+    className="btn btn-outline-danger"
+    disabled={isSuspended}
+    onClick={() => setShowModal("withdraw")}
+  >
+    Withdraw
+  </button>
+
+  <button
+    className="btn btn-primary"
+    disabled={isSuspended}
+    onClick={() => setShowModal("transfer")}
+  >
+    Transfer
+  </button>
+</div>
           </div>
         </div>
       </div>
@@ -294,17 +334,18 @@ export default function Dashboard() {
                     Cancel
                   </button>
 
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    disabled={
-                      (showModal === "transfer" && !formData.transferType) ||
-                      (showModal === "deposit" && !formData.depositMethod) ||
-                      (showModal === "withdraw" && !formData.withdrawMethod)
-                    }
-                  >
-                    Confirm
-                  </button>
+<button
+  type="submit"
+  className="btn btn-success"
+  disabled={
+    isSuspended ||
+    (showModal === "transfer" && !formData.transferType) ||
+    (showModal === "deposit" && !formData.depositMethod) ||
+    (showModal === "withdraw" && !formData.withdrawMethod)
+  }
+>
+  Confirm
+</button>
                 </div>
               </form>
             </div>

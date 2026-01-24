@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AppNavbar from "./components/Navbar.jsx";
 import Footer from "./components/Footer.jsx";
 
@@ -16,17 +16,32 @@ import AdminDashboard from "./pages/AdminDashboard.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import { getAuthData, saveAuthData } from "./utils/auth.js";
 
-// ✅ Import Toast
-import { ToastContainer } from "react-toastify";
+// ✅ Toast
+import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-function Layout() {
+function Layout({ loading, suspensionMessage }) {
   const location = useLocation();
   const hideFooter = ["/login", "/register"].includes(location.pathname);
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div className="d-flex flex-column min-vh-100 position-relative">
       <AppNavbar />
+
+      {/* 🔴 Suspension banner */}
+      {suspensionMessage && (
+        <div className="alert alert-danger text-center m-0 rounded-0">
+          {suspensionMessage}
+        </div>
+      )}
+
+      {/* 🔄 Global loading bar */}
+      {loading && (
+        <div className="text-center py-2 bg-light small">
+          Processing request…
+        </div>
+      )}
+
       <main className="flex-grow-1">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -35,6 +50,7 @@ function Layout() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
           <Route
             path="/dashboard"
             element={
@@ -43,7 +59,9 @@ function Layout() {
               </ProtectedRoute>
             }
           />
+
           <Route path="/admin-login" element={<AdminLogin />} />
+
           <Route
             path="/admin-dashboard"
             element={
@@ -54,12 +72,17 @@ function Layout() {
           />
         </Routes>
       </main>
+
       {!hideFooter && <Footer />}
     </div>
   );
 }
 
 function App() {
+  const [loading, setLoading] = useState(false);
+  const [suspensionMessage, setSuspensionMessage] = useState(null);
+
+  // ✅ Restore auth on refresh
   useEffect(() => {
     const auth = getAuthData();
     if (auth?.token && auth?.user) {
@@ -67,12 +90,35 @@ function App() {
     }
   }, []);
 
+  // ✅ Listen for API loading events
+  useEffect(() => {
+    const start = () => setLoading(true);
+    const end = () => setLoading(false);
+
+    window.addEventListener("api:loading:start", start);
+    window.addEventListener("api:loading:end", end);
+
+    return () => {
+      window.removeEventListener("api:loading:start", start);
+      window.removeEventListener("api:loading:end", end);
+    };
+  }, []);
+
+  // 🔴 Listen for suspended account
+  useEffect(() => {
+    const handler = (e) => {
+      setSuspensionMessage(e.detail.message);
+      toast.error(e.detail.message);
+    };
+
+    window.addEventListener("account:suspended", handler);
+    return () => window.removeEventListener("account:suspended", handler);
+  }, []);
+
   return (
     <Router>
-      {/* ✅ Toast container goes here */}
-      <ToastContainer position="top-right" autoClose={2000} />
-
-      <Layout />
+      <ToastContainer position="top-right" autoClose={3000} />
+      <Layout loading={loading} suspensionMessage={suspensionMessage} />
     </Router>
   );
 }

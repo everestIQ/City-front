@@ -8,6 +8,7 @@ const API_BASE_URL =
 // ✅ Create axios instance
 const API = axios.create({
   baseURL: API_BASE_URL,
+  // withCredentials: true, // 🔑 important for mobile & cross-domain
 });
 
 // ✅ Request interceptor (auth token)
@@ -37,6 +38,23 @@ API.interceptors.response.use(
   },
   (error) => {
     window.dispatchEvent(new Event("api:loading:end"));
+
+    // 🔴 HANDLE SUSPENDED ACCOUNT GLOBALLY
+    if (
+      error.response?.status === 403 &&
+      error.response?.data?.error === "Account suspended"
+    ) {
+      window.dispatchEvent(
+        new CustomEvent("account:suspended", {
+          detail: {
+            message:
+              error.response.data.message ||
+              "Your account is suspended. Transfers are disabled.",
+          },
+        })
+      );
+    }
+
     return Promise.reject(error);
   }
 );
