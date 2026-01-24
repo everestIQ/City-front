@@ -47,6 +47,8 @@ export default function Dashboard() {
       const res = await getDashboard();
           // 👇 ADD THIS LINE RIGHT HERE
     console.log("ACCOUNT FROM API:", res.data.account);
+    console.log("RENDER CHECK → account:", res.data.account);
+
 
       setUser(res.data.user);
       setAccount(res.data.account || null);
