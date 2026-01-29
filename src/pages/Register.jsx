@@ -77,19 +77,21 @@ function Register() {
       setLoading(true);
 
       const res = await fetch(`${API_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // safe if backend later uses cookies
-        body: JSON.stringify({
-          ...formData,
-          accountType: formData.accountType.toUpperCase(),
-        }),
-      });
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+  ...formData,
+  address: formData.address.trim(),
+  accountType: formData.accountType.toUpperCase(),
+}),
+
+   });
 
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data?.message || "Registration failed");
+        throw new Error(data?.error || data?.message || "Registration failed");
+
       }
 
       navigate("/login");
