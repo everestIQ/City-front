@@ -1,7 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { loginUser } from "../api";
-
 import { saveAuthData } from "../utils/auth";
 
 function Login() {
@@ -10,32 +9,43 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [error, setError] = useState("");
+
   const navigate = useNavigate();
- 
-const handleLogin = async (e) => {
-  e.preventDefault();
-  setError("");
+  const location = useLocation();
 
-  try {
-    const res = await loginUser({ email, password });
+  const successMessage = location.state?.success;
 
-    const { token, user } = res.data;
-    saveAuthData(token, user, remember);
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-    navigate(user.role === "ADMIN" ? "/admin-dashboard" : "/dashboard");
-  } catch (err) {
-    console.error(err);
-    setError(err.response?.data?.error || "Login failed");
-  }
-};
+    try {
+      const res = await loginUser({ email, password });
 
+      const { token, user } = res.data;
+      saveAuthData(token, user, remember);
+
+      navigate(user.role === "ADMIN" ? "/admin-dashboard" : "/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.error || "Login failed");
+    }
+  };
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="card shadow p-4" style={{ width: "100%", maxWidth: "400px" }}>
         <h3 className="text-center mb-3">User Login</h3>
+
+        {/* ✅ Success message from registration */}
+        {successMessage && (
+          <div className="alert alert-success">{successMessage}</div>
+        )}
+
+        {/* ❌ Login error */}
+        {error && <div className="alert alert-danger">{error}</div>}
+
         <form onSubmit={handleLogin}>
-          {error && <div className="alert alert-danger">{error}</div>}
           <div className="mb-3">
             <label className="form-label">Email Address</label>
             <input

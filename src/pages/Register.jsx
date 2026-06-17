@@ -94,13 +94,17 @@ function Register() {
 
       }
 
-      navigate("/login");
+      navigate("/login", {
+  state: { success: "Registration successful. Please log in." },
+});
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
-    }
+    }0
+    
   };
+
 
   return (
     <div className="container mt-5">
