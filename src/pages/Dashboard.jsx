@@ -14,7 +14,8 @@ export default function Dashboard() {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(null);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [formData, setFormData] = useState({
   amount: "",
   recipientEmail: "",
@@ -77,9 +78,12 @@ export default function Dashboard() {
 
   /* ---------------- ACTION HANDLER ---------------- */
   const handleSubmitAction = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    console.log("TRANSFER SUBMITTING");
+  if (isSubmitting) return; // 🚨 BLOCK DUPLICATES
+  setIsSubmitting(true);
+
+  console.log("TRANSFER SUBMITTING");
 
       // 🔒 BLOCK ACTIONS IF SUSPENDED
   if (isSuspended && showModal !== "deposit") {
@@ -643,11 +647,12 @@ const suspensionMessage =
   type="submit"
   className="btn btn-success"
   disabled={
-    isSuspended ||
-    (showModal === "transfer" && !formData.transferType) ||
-    (showModal === "deposit" && !formData.depositMethod) ||
-    (showModal === "withdraw" && !formData.withdrawMethod)
-  }
+  isSuspended ||
+  isSubmitting ||
+  !formData.amount ||
+  (showModal === "transfer" && !formData.transferType) ||
+  (showModal === "withdraw" && !formData.withdrawMethod)
+}
 >
   Confirm
 </button>
