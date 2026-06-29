@@ -11,6 +11,8 @@ export default function UsersTable() {
   const [showFundModal, setShowFundModal] = useState(false);
   const [fundAmount, setFundAmount] = useState("");
   const [selectedAccountId, setSelectedAccountId] = useState(null);
+  
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const [newUser, setNewUser] = useState({
     firstName: "",
@@ -38,7 +40,7 @@ export default function UsersTable() {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/admin/users", {
+      const res = await axios.get(`${API_URL}/admin/users`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data.users);
@@ -56,7 +58,7 @@ export default function UsersTable() {
     }
     try {
       const res = await axios.post(
-        "http://localhost:5000/admin/fund",
+        `${API_URL}/admin/fund`,
         { accountId: selectedAccountId, amount: parseFloat(fundAmount) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -74,7 +76,7 @@ export default function UsersTable() {
   const toggleTransactionStatus = async (userId, isSuspended) => {
     try {
       const res = await axios.patch(
-        `http://localhost:5000/admin/users/${userId}/suspend`,
+        `${API_URL}/admin/users/${userId}/suspend`,
         { suspend: !isSuspended },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -88,7 +90,7 @@ export default function UsersTable() {
   const createUser = async () => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/admin/users",
+        `${API_URL}/admin/users`,
         newUser,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -113,7 +115,7 @@ export default function UsersTable() {
   const updateUser = async () => {
     try {
       const res = await axios.put(
-        `http://localhost:5000/admin/users/${editUser.id}`,
+        `${API_URL}/admin/users/${editUser.id}`,
         editUser,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -130,7 +132,7 @@ export default function UsersTable() {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
       const res = await axios.delete(
-        `http://localhost:5000/admin/users/${id}`,
+        `${API_URL}/admin/users/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMessage("✅ " + res.data.message);
